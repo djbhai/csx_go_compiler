@@ -1,0 +1,30 @@
+// simple interest
+
+package simpleInterest
+
+var principal int ;
+var time int;
+var roi int;
+
+func interest(p int, t int,r int) int
+{
+var i  int= p*t*r/100;
+return i;
+}
+
+func main()
+{
+var in int;
+print "Simple interest:","\n";
+print "enter pricipal","\n";
+read principal;
+print "enter time","\n";
+read time;
+print "enter interest","\n";
+read roi;
+in = interest(principal,time,roi);
+print "the interest is",in,"\n";
+print "Test completed","\n";
+}
+
+

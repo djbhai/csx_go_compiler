@@ -1,0 +1,13 @@
+//celsius to fahrenheit conversion
+
+package testcase
+func main()	{
+ Var celsius int;
+Var fahrenheit int;
+print "Testing celsius to fahrenheit conversion","\n";
+print "enter the temperature in celsius","\n";
+read celsius;
+fahrenheit = (celsius*(9/5))+32;
+print fahrenheit;
+print "Test completed","\n";
+		}

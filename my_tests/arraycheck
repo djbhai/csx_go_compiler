@@ -1,0 +1,25 @@
+package test2
+
+func main()	{
+
+VAR a int[10];
+Var b  int;
+
+b= 0;
+a[0] =0;
+print " Testing array subscript assignment:","\n";
+if(a[0] < b)
+{
+print "wrong control flow","\n";
+
+}
+
+else
+{
+print "good going","\n";
+
+}
+
+print "Test completed","\n";
+
+		}

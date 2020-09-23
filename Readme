@@ -1,0 +1,18 @@
+
+
+The global  variables are created first before the main method([String) is declared.
+
+If those global variables have any initialized values they are assigned after the main method is declared in
+the program nodes code generation phase.
+
+Declnodes code generation takes care of the declaration and initialization of local variables.
+
+
+Each expression node loads a value into the stack to be used by the statements.
+
+Integer to character type casting opcode is provided. Other type castings weren't performed. Seemed redundant in code generation
+phase. As booleans and characters are by default represented as ints.
+
+The test case 36,39,43 produced errors
+
+The hints used in the project description were used for the most part.

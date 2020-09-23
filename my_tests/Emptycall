@@ -1,0 +1,10 @@
+package world
+
+func helloworld()	{
+print "Testing world class","\n";
+print "Hello world","\n";
+			}
+func main()	{
+ helloworld();
+ print "Test completed","\n";
+		}

@@ -1,0 +1,340 @@
+import java_cup.runtime.*;
+
+class MI_int {
+        
+         final static int MAX_VALUE=2147483647;                          
+         final static int MIN_VALUE= -2147483648;
+         
+
+            }
+class CSXToken {
+	int linenum;
+	int colnum;
+	CSXToken(int line,int col) {
+		linenum=line;colnum=col;
+	}
+}
+
+class CSXIntLitToken extends CSXToken {
+	int intValue;
+	CSXIntLitToken(int val,int line,int col) {
+	   super(line,col);intValue=val; 
+	};
+}
+
+class CSXIdentifierToken extends CSXToken
+ {
+	String identifierText;
+	CSXIdentifierToken(String text,int line,int col) {
+		super(line,col);identifierText=text;
+	}
+}
+
+class CSXCharLitToken extends CSXToken {
+	char charValue;
+	CSXCharLitToken(char val,int line,int col) {
+		super(line,col);charValue=val;
+	}
+}
+
+class CSXStringLitToken extends CSXToken {
+	String stringText; // Full text of string literal,
+                          //  including quotes & escapes
+	CSXStringLitToken(String text,int line,int col) {
+		super(line,col);
+		stringText=text;
+	}
+}
+
+// This class is used to track line and column numbers
+// Feel free to change to extend it
+class Pos {
+	static int  linenum = 1; /* maintain this as line number current
+                                 token was scanned on */
+	static int  colnum = 1; /* maintain this as column number current
+                                 token began at */
+	static int  line = 1; /* maintain this as line number after
+					scanning current token  */
+	static int  col = 1; /* maintain this as column number after
+					scanning current token  */
+	static void setpos() { // set starting position for current token
+		linenum = line;
+		colnum = col;
+	}
+}
+/*
+class Symbol { 
+	public int sym;
+	public CSXToken value;
+	public Symbol(int tokenType, CSXToken theToken) {
+		sym = tokenType;
+		value = theToken;
+	}
+}
+*/
+
+%%
+
+rw_IF= [iI][fF]
+rw_READ= [rR][eE][aA][dD]
+
+rw_BOOL=[bB][oO][oO][lL] 
+
+rw_CHAR=[cC][hH][aA][rR] 
+
+rw_CONST=[cC][oO][nN][sS][tT]
+
+rw_ELSE= [eE][lL][sS][eE] 
+
+
+rw_FALSE= [fF][aA][lL][sS][eE] 
+
+rw_FOR= [fF][oO][rR] 
+
+rw_FUNC= [fF][uU][nN][cC] 
+
+
+
+
+rw_INT = [iI][nN][tT]
+rw_PACKAGE= [pP][aA][cC][kK][aA][gG][eE] 
+
+rw_PRINT= [pP][rR][iI][nN][tT]
+
+rw_RETURN= [rR][eE][tT][uU][rR][nN]
+
+rw_TRUE= [tT][rR][uU][eE] 
+
+VAR= [vV][aA][rR] 
+DIGIT=[0-9]
+INTEGA=(\~|""){DIGIT}+
+LETTER= [a-z]|[A-Z]
+WHITESPACE=[ \t\n]
+
+EOL=[^\n]
+EL=\n
+
+
+esc = (\\n|\\t|\\\"|\\\\|"\'")                 
+complement = [^\"\\]
+// SOther=\\[\n\t\\\"]
+// Other = (\\|\ |\/|<|>|,|.|_|-|\[|\]|\(|\)|\*|&|\^|%|\$|#|@|\!|\~|\`|\?|\{)
+
+Charlit= '({complement}|{esc})'
+StringLit= \"(({complement}|{esc})*)\"
+
+
+
+IDENTIFIER= {LETTER}({LETTER}|{DIGIT})*
+SINGLECOMMENT= "//"{EOL}*{EL}
+MULTICOMMENT= "##"(("#"|"")[^#]*)"##"
+
+%type Symbol
+%eofval{
+  return new Symbol(sym.EOF, new CSXToken(0,0));
+%eofval}
+
+
+%%
+{EL} {
+
+ Pos.setpos();Pos.line+=1;Pos.col=1;
+ /*return new Symbol(sym.EL, new CSXToken(Pos.linenum, Pos.colnum));*/
+
+}
+{rw_IF} {
+ Pos.setpos(); Pos.col+=2;
+ return new Symbol(sym.rw_IF, new CSXToken(Pos.linenum, Pos.colnum));
+
+  }
+{rw_BOOL} {
+  Pos.setpos(); Pos.col+=4;
+return new Symbol(sym.rw_BOOL, new CSXToken(Pos.linenum, Pos.colnum));
+}
+
+{rw_CHAR} {
+ Pos.setpos(); Pos.col+=4;
+return new Symbol(sym.rw_CHAR, new CSXToken(Pos.linenum, Pos.colnum));
+
+}
+
+{rw_CONST} {
+ Pos.setpos(); Pos.col+=5;
+return new Symbol(sym.rw_CONST,new CSXToken(Pos.linenum, Pos.colnum));
+}
+
+
+
+
+{rw_ELSE} {
+ Pos.setpos(); Pos.col+=4;
+return  new Symbol( sym.rw_ELSE, new CSXToken(Pos.linenum, Pos.colnum));
+
+}
+
+{rw_FALSE} {
+Pos.setpos(); Pos.col+=5;
+return new Symbol( sym.rw_FALSE, new CSXToken(Pos.linenum, Pos.colnum));
+
+}
+
+{rw_FOR} {
+return new Symbol( sym.rw_FOR, new CSXToken(Pos.linenum, Pos.colnum));
+
+}
+
+{rw_FUNC} {
+Pos.setpos(); Pos.col+=4;
+return new Symbol( sym.rw_FUNC, new CSXToken(Pos.linenum, Pos.colnum));
+
+}
+{rw_INT} {
+Pos.setpos(); Pos.col+=3;
+return new Symbol( sym.rw_INT, new CSXToken(Pos.linenum, Pos.colnum));
+}
+
+{rw_PACKAGE} {
+Pos.setpos(); Pos.col+=7;
+return new Symbol( sym.rw_PACKAGE, new CSXToken(Pos.linenum, Pos.colnum));
+}
+{rw_PRINT} {
+Pos.setpos(); Pos.col+=5;
+return new Symbol( sym.rw_PRINT, new CSXToken (Pos.linenum,Pos.colnum));
+}
+
+{rw_READ} {
+Pos.setpos(); Pos.col+=4;
+return new Symbol ( sym.rw_READ, new CSXToken(Pos.linenum, Pos.colnum));
+}
+{rw_RETURN} {
+Pos.setpos(); Pos.col+=6;
+return new Symbol( sym.rw_RETURN, new CSXToken(Pos.linenum, Pos.colnum)); 
+}
+{rw_TRUE} {
+Pos.setpos(); Pos.col+=4;
+return new Symbol( sym.rw_TRUE, new CSXToken(Pos.linenum, Pos.colnum));
+}
+{VAR} {
+Pos.setpos(); Pos.col+=3;
+return new Symbol( sym.VAR,  new CSXToken(Pos.linenum, Pos.colnum));
+}
+
+
+"+"	{
+	Pos.setpos(); Pos.col += 1; return new Symbol(sym.PLUS, new CSXToken(Pos.linenum,Pos.colnum)); }
+
+"-"     {
+
+        Pos.setpos(); Pos.col +=1; return new Symbol(sym.MINUS, new
+CSXToken(Pos.linenum, Pos.colnum));}
+
+        
+ "!="	{ Pos.setpos(); Pos.col +=2; return new Symbol(sym.NOTEQ, new CSXToken(Pos.linenum,Pos.colnum)); } 
+ ";"	{ Pos.setpos(); Pos.col +=1; return new Symbol(sym.SEMI, new CSXToken(Pos.linenum,Pos.colnum));}
+ "(" { Pos.setpos(); Pos.col +=1; return new Symbol(sym.LPAREN,
+new CSXToken(Pos.linenum,Pos.colnum));}
+")" { Pos.setpos(); Pos.col +=1; return new Symbol(sym.RPAREN,
+new CSXToken(Pos.linenum,Pos.colnum));}
+
+"[" { Pos.setpos(); Pos.col +=1; return new Symbol(sym.LBRACKET,
+new CSXToken(Pos.linenum,Pos.colnum));}
+
+"]" { Pos.setpos(); Pos.col +=1; return new Symbol(sym.RBRACKET,
+new CSXToken(Pos.linenum,Pos.colnum));}
+"=" { Pos.setpos(); Pos.col +=1; return new Symbol(sym.ASG,
+new CSXToken(Pos.linenum,Pos.colnum));}
+
+
+
+"*" { Pos.setpos(); Pos.col+=1; return new Symbol(sym.MULT,
+new CSXToken(Pos.linenum,Pos.colnum));}
+
+"/" { Pos.setpos(); Pos.col+=1; return new Symbol(sym.SLASH,
+new CSXToken(Pos.linenum,Pos.colnum));}
+
+"==" { Pos.setpos(); Pos.col+=2; return new Symbol(sym.EQ,
+new CSXToken(Pos.linenum,Pos.colnum));}
+"&&" { Pos.setpos(); Pos.col+=2; return new Symbol(sym.CAND,
+new CSXToken(Pos.linenum,Pos.colnum));}
+"||" { Pos.setpos(); Pos.col+=2; return new Symbol(sym.COR,
+new CSXToken(Pos.linenum,Pos.colnum));}
+"<" { Pos.setpos(); Pos.col+=1; return new Symbol(sym.LT,
+new CSXToken(Pos.linenum,Pos.colnum));}
+">" { Pos.setpos(); Pos.col+=1; return new Symbol(sym.GT,
+new CSXToken(Pos.linenum,Pos.colnum));}
+"<=" { Pos.setpos(); Pos.col+=2; return new Symbol(sym.LEQ,
+new CSXToken(Pos.linenum,Pos.colnum));}
+">=" { Pos.setpos(); Pos.col+=2; return new Symbol(sym.GEQ,
+new CSXToken(Pos.linenum,Pos.colnum));}
+"," { Pos.setpos(); Pos.col+=1; return new Symbol(sym.COMMA,
+new CSXToken(Pos.linenum,Pos.colnum));}
+"!" { Pos.setpos(); Pos.col+=1; return new Symbol(sym.NOT,
+new CSXToken(Pos.linenum,Pos.colnum));}
+
+"{" { Pos.setpos(); Pos.col+=1; return new Symbol(sym.LBRACE,
+new CSXToken(Pos.linenum,Pos.colnum));}
+
+"}" { Pos.setpos(); Pos.col+=1; return new Symbol(sym.RBRACE,
+new CSXToken(Pos.linenum,Pos.colnum));}
+
+{INTEGA} 	{ // This def doesn't check for overflow -- be sure to update it 
+if(yytext().substring(0,1).equals("~"))	{
+   Pos.setpos(); Pos.col+=yytext().length();
+	String s= "-";
+ 		s= s.concat(yytext().substring(1));
+   return new Symbol(sym.INTLIT, new CSXIntLitToken(Integer.parseInt(s),Pos.linenum,Pos.colnum));
+					}
+
+
+  if(MI_int.MAX_VALUE < Integer.parseInt(yytext())){
+       Pos.setpos(); Pos.col += yytext().length();
+           
+       return new Symbol(sym.INTLIT, new CSXIntLitToken(MI_int.MAX_VALUE, Pos.linenum,Pos.colnum));         
+
+                                            }
+ if(MI_int.MIN_VALUE>Integer.parseInt(yytext())){
+
+   Pos.setpos(); Pos.col+=yytext().length();
+   return new Symbol(sym.INTLIT, new CSXIntLitToken(MI_int.MIN_VALUE, Pos.linenum,Pos.colnum));         
+                                         }
+
+  Pos.setpos(); Pos.col+= yytext().length(); return new Symbol(sym.INTLIT, new CSXIntLitToken(Integer.parseInt(yytext()),Pos.linenum, Pos.colnum));} 
+
+       
+ {Charlit} {
+Pos.setpos(); Pos.col +=yytext().length(); return new Symbol(sym.CHARLIT,new CSXCharLitToken(yytext().charAt(1), Pos.linenum, Pos.colnum));}
+
+
+{StringLit} {
+Pos.setpos(); Pos.col += yytext().length(); return new Symbol(sym.STRLIT, new CSXStringLitToken(yytext(), Pos.linenum, Pos.colnum));}
+
+
+
+                                  
+{IDENTIFIER} { Pos.setpos(); Pos.col+= yytext().length(); 
+return new Symbol( sym.IDENTIFIER, new CSXIdentifierToken(yytext(), Pos.linenum, Pos.colnum)); }
+ 
+{WHITESPACE} {Pos.setpos(); Pos.col+=1;}
+
+. {
+
+Pos.setpos(); Pos.col+= yytext().length(); 
+return new Symbol( sym.error, new CSXToken( Pos.linenum, Pos.colnum));
+}
+
+{SINGLECOMMENT} {
+Pos.setpos();
+Pos.line+=1;
+
+}
+{MULTICOMMENT} {
+for(int i=0; i< yytext().length()-1;i++){
+          Pos.setpos();
+          if((yytext().substring(i,i+2)).equals("/n")){                     
+             
+             Pos.line+=1;
+       }
+       }
+ Pos.line += 1;
+}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
